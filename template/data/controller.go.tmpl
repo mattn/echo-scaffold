@@ -1,0 +1,102 @@
+package controllers
+
+import (
+	"{{.PackageName}}/helpers"
+	"{{.PackageName}}/models"
+	"github.com/labstack/echo"
+	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	// Err{{.ModelName}}NotFound is returned when the {{.InstanceName}} was not found.
+	Err{{.ModelName}}NotFound     = helpers.NewResponseError(404, "{{.InstanceName}} not found")
+
+	// ErrCannotDelete{{.ModelName}} is returned when the {{.InstanceName}} can't be deleted.
+	ErrCannotDelete{{.ModelName}} = helpers.NewResponseError(404, "cannot delete {{.InstanceName}}")
+)
+
+// {{.ControllerName}}Controller is the {{.ModelName}} controller.
+type {{.ControllerName}}Controller struct {
+	Router *echo.Router
+}
+
+func (controller *{{.ControllerName}}Controller) create{{.ModelName}}(c echo.Context) error {
+	c.Request().ParseForm()
+
+	{{.InstanceName}} := &models.{{.ModelName}}{}
+	{{.InstanceName}}.SetAttributes(c.Request().Form)
+
+	defer {{.InstanceName}}.Save()
+	if len({{.InstanceName}}.ErrorMessages()) == 0 {
+		return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
+	}
+	return helpers.JSONResponse(c, 400, {{.InstanceName}}.ErrorMessages())
+}
+
+func (controller *{{.ControllerName}}Controller) list{{.ModelNamePlural}}(c echo.Context) error {
+	session := models.New{{.ModelName}}DBSession()
+	defer session.Close()
+
+	query := session.Query(bson.M{})
+	query.Sort("-created_at").Limit(20)
+
+	{{.InstanceNamePlural}}, _ := models.Load{{.ModelNamePlural}}(query)
+	{{.InstanceNamePlural}}Response := make([]helpers.ResponseMap, len({{.InstanceNamePlural}}))
+	for i, {{.InstanceNamePlural}} := range {{.InstanceNamePlural}} {
+		{{.InstanceNamePlural}}Response[i] = {{.InstanceNamePlural}}.ToResponseMap()
+	}
+
+	return helpers.JSONResponseArray(c, 200, {{.InstanceNamePlural}}Response)
+}
+
+func (controller *{{.ControllerName}}Controller) get{{.ModelName}}(c echo.Context) error {
+	{{.InstanceName}}, err := find{{.ModelName}}ByID(c)
+
+	if err != nil {
+		return helpers.JSONResponseError(c, err)
+	}
+
+    return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
+}
+
+func (controller *{{.ControllerName}}Controller) update{{.ModelName}}(c echo.Context) error {
+	{{.InstanceName}}, err := find{{.ModelName}}ByID(c)
+
+	if err != nil {
+		return helpers.JSONResponseError(c, err)
+	}
+
+	{{.InstanceName}}.SetAttributes(c.Request().Form)
+
+	defer {{.InstanceName}}.Save()
+	if len({{.InstanceName}}.ErrorMessages()) == 0 {
+		return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
+	}
+	return helpers.JSONResponse(c, 400, {{.InstanceName}}.ErrorMessages())
+}
+
+func (controller *{{.ControllerName}}Controller) delete{{.ModelName}}(c echo.Context) error {
+	{{.InstanceName}}, err := find{{.ModelName}}ByID(c)
+
+	if err != nil {
+		return helpers.JSONResponseError(c, err)
+	}
+
+	if err := {{.InstanceName}}.Delete(); err == nil {
+		return helpers.JSONResponse(c, 200, helpers.ResponseMap{})
+	}
+
+	return helpers.JSONResponseError(c, ErrCannotDelete{{.ModelName}})
+}
+
+// Setup sets up routes for the {{.ModelName}} controller.
+func (controller *{{.ControllerName}}Controller) Setup() {
+	controller.Router.Add("POST", "/{{.RoutePath}}", controller.create{{.ModelName}})
+	controller.Router.Add("GET", "/{{.RoutePath}}", controller.list{{.ModelNamePlural}})
+	controller.Router.Add("GET", "/{{.RoutePath}}/:{{.InstanceName | Underscore}}_id", controller.get{{.ModelName}})
+	controller.Router.Add("PUT", "/{{.RoutePath}}/:{{.InstanceName | Underscore}}_id", controller.update{{.ModelName}})
+	controller.Router.Add("DELETE", "/{{.RoutePath}}/:{{.InstanceName | Underscore}}_id", controller.delete{{.ModelName}})
+}
+
+// vi:syntax=go
+

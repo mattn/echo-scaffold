@@ -1,0 +1,172 @@
+{{$instanceName := .InstanceName}}\
+package models
+
+import (
+	"{{.PackageName}}/helpers"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+	"net/url"
+	"time"
+	"errors"
+	"strconv"
+)
+
+var (
+	// ErrInvalidDoc is return when the document is not valid
+	ErrInvalidDoc = errors.New("document is invalid")
+)
+
+// {{.ModelName}} is a model
+type {{.ModelName}} struct {
+	ID bson.ObjectId  `bson:"_id,omitempty"`
+{{range $fieldName, $fieldType := .Fields}}\
+	{{$fieldName}} {{$fieldType}} `bson:"{{$fieldName | Underscore}}"`
+{{end}}\
+	CreatedAt int64 `bson:"created_at"`
+	UpdatedAt int64 `bson:"updated_at"`
+	Errors helpers.Errors `bson:"-"`
+}
+
+// New{{.ModelName}} creates a new instance of {{.ModelName}}
+func New{{.ModelName}}() *{{.ModelName}} {
+	{{.InstanceName}} := &{{.ModelName}}{}
+
+	// Set default values here
+
+	return {{.InstanceName}}
+}
+
+// SaveWithSession saves the {{.ModelName}} using the given db session
+func ({{.InstanceName}} *{{.ModelName}}) SaveWithSession(dbSession *{{.ModelName}}DBSession) error {
+	isNewRecord := (len({{.InstanceName}}.ID) == 0)
+	{{.InstanceName}}.setDefaultFields(isNewRecord)
+
+	if !{{.InstanceName}}.IsValid() {
+		return ErrInvalidDoc
+	}
+
+	if isNewRecord {
+		return {{.InstanceName}}.insert(dbSession)
+	}
+
+	return {{.InstanceName}}.update(dbSession)
+}
+
+// Save saves the {{.ModelName}}
+func ({{.InstanceName}} *{{.ModelName}}) Save() error {
+	dbSession := New{{.ModelName}}DBSession()
+	defer dbSession.Close()
+
+	return {{.InstanceName}}.SaveWithSession(dbSession)
+}
+
+func ({{.InstanceName}} *{{.ModelName}}) DeleteWithSession(dbSession *{{.ModelName}}DBSession) error {
+	return dbSession.Delete(bson.M{
+		"_id": {{.InstanceName}}.ID,
+	})
+}
+
+func ({{.InstanceName}} *{{.ModelName}}) Delete() error {
+	dbSession := New{{.ModelName}}DBSession()
+	defer dbSession.Close()
+
+	return {{.InstanceName}}.DeleteWithSession(dbSession)
+}
+
+func ({{.InstanceName}} *{{.ModelName}}) setDefaultFields(isNewRecord bool) {
+	if isNewRecord {
+		{{.InstanceName}}.ID = bson.NewObjectId()
+		{{.InstanceName}}.CreatedAt = time.Now().Unix()
+	} else {
+		{{.InstanceName}}.UpdatedAt = time.Now().Unix()
+	}
+}
+
+func ({{.InstanceName}} *{{.ModelName}}) insert(dbSession *{{.ModelName}}DBSession) error {
+	return dbSession.Insert({{.InstanceName}})
+}
+
+func ({{.InstanceName}} *{{.ModelName}}) update(dbSession *{{.ModelName}}DBSession) error {
+	return dbSession.Update({{.InstanceName}})
+}
+
+// ToResponseMap converts the {{.ModelName}} to a map to be returned by the API as a response.
+func ({{.InstanceName}} *{{.ModelName}}) ToResponseMap() helpers.ResponseMap {
+	return helpers.ResponseMap{
+		"id": {{.InstanceName}}.ID,
+{{range $fieldName, $fieldType := .Fields}}\
+		"{{$fieldName | Underscore}}": {{$instanceName}}.{{$fieldName}},
+{{end}}\
+	}
+}
+
+// ErrorMessages returns validation errors.
+func ({{.InstanceName}} *{{.ModelName}}) ErrorMessages() helpers.ResponseMap {
+	errorMessages := helpers.ResponseMap{}
+	for fieldName, message := range {{.InstanceName}}.Errors.Messages {
+		errorMessages[fieldName] = message
+	}
+
+	return errorMessages
+}
+
+// IsValid returns true if all validations are passed.
+func ({{.InstanceName}} *{{.ModelName}}) IsValid() bool {
+	{{.InstanceName}}.Errors.Clear()
+
+	// Run validations here.
+
+	return !{{.InstanceName}}.Errors.HasMessages()
+}
+
+// SetAttributes sets the attributes for this {{.ModelName}}
+func ({{.InstanceName}} *{{.ModelName}}) SetAttributes(params url.Values) {
+	// for avoiding compile unused strconv error.
+	var _ = strconv.FormatBool(true)
+
+{{range $fieldName, $fieldType := .Fields}}\
+	if value, ok := params["{{$fieldName | Underscore}}"]; ok {
+		{{$instanceName}}.{{$fieldName}}{{ ret $fieldType }} = {{ conv "value[0]" $fieldType }}
+	}
+{{end}}\
+}
+
+// FindOne{{.ModelName}} finds a {{.InstanceName}} in the database using the given `query`
+func FindOne{{.ModelName}}(query bson.M) (*{{.ModelName}}, error) {
+	dbSession := New{{.ModelName}}DBSession()
+	defer dbSession.Close()
+
+	criteria := dbSession.Query(query)
+	return FindOne{{.ModelName}}ByCriteria(criteria)
+}
+
+// FindOne{{.ModelName}}ByCriteria finds a single document given a criteria
+func FindOne{{.ModelName}}ByCriteria(criteria *mgo.Query) (*{{.ModelName}}, error) {
+	{{.InstanceName}} := &{{.ModelName}}{}
+	err := criteria.One({{.InstanceName}})
+	if err != nil {
+		return nil, err
+	}
+
+	return {{.InstanceName}}, nil
+}
+
+// FindOne{{.ModelName}}ByID finds a {{.ModelName}} in the database using the given `id`
+func FindOne{{.ModelName}}ByID(id string) (*{{.ModelName}}, error) {
+	{{.InstanceName}}ID := bson.ObjectIdHex(id)
+	return FindOne{{.ModelName}}(bson.M{"_id": {{.InstanceName}}ID})
+}
+
+// Load{{.ModelNamePlural}} takes a query a tries to convert it into a {{.ModelName}} array.
+func Load{{.ModelNamePlural}}(query *mgo.Query) ([]*{{.ModelName}}, error) {
+	{{.InstanceNamePlural}} := []*{{.ModelName}}{}
+
+	err := query.All(&{{.InstanceNamePlural}})
+	if err != nil {
+        return {{.InstanceNamePlural}}, err
+	}
+
+	return {{.InstanceNamePlural}}, nil
+}
+
+// vi:syntax=go

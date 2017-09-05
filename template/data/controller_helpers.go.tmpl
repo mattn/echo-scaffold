@@ -1,0 +1,21 @@
+package controllers
+
+import (
+	"{{.PackageName}}/helpers"
+	"{{.PackageName}}/models"
+	"github.com/labstack/echo"
+)
+
+func find{{.ModelName}}ByID(c echo.Context) (*models.{{.ModelName}}, *helpers.ResponseError) {
+	c.Request().ParseForm()
+
+	{{.InstanceName}}, _ := models.FindOne{{.ModelName}}ByID(c.Param("{{.InstanceName | Underscore}}_id"))
+	if {{.InstanceName}} == nil {
+		return nil, Err{{.ModelName}}NotFound
+	}
+
+	return {{.InstanceName}}, nil
+}
+
+// vi:syntax=go
+

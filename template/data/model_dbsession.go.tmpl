@@ -1,0 +1,65 @@
+package models
+
+import (
+	"{{.PackageName}}/config"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
+
+var (
+	// Max{{.ModelNamePlural}}ToFetch is the maximum {{.InstanceNamePlural}} that are fetched from the db.
+    Max{{.ModelNamePlural}}ToFetch = 50
+)
+
+// {{.ModelName}}DBSession handles the connections to the database
+type {{.ModelName}}DBSession struct {
+	backend *mgo.Session
+}
+
+// New{{.ModelName}}DBSession creates a new database session.
+func New{{.ModelName}}DBSession() *{{.ModelName}}DBSession {
+	return &{{.ModelName}}DBSession{backend: config.DBSession().Copy()}
+}
+
+// Close closes the database session.
+func (dbSession *{{.ModelName}}DBSession) Close() {
+	dbSession.backend.Close()
+}
+
+// Insert inserts a {{.InstanceName}} in the database.
+func (dbSession *{{.ModelName}}DBSession) Insert({{.InstanceName}} *{{.ModelName}}) error {
+	return dbSession.collection().Insert({{.InstanceName}})
+}
+
+// Update updates the db with the given {{.InstanceName}}
+func (dbSession *{{.ModelName}}DBSession) Update({{.InstanceName}} *{{.ModelName}}) error {
+	return dbSession.collection().UpdateId({{.InstanceName}}.ID, {{.InstanceName}})
+}
+
+// Query creates a query
+func (dbSession *{{.ModelName}}DBSession) Query(query bson.M) *mgo.Query {
+	criteria := dbSession.collection().Find(query).Limit(Max{{.ModelNamePlural}}ToFetch)
+
+	return criteria
+}
+
+// Delete deletes a single {{.InstanceName}} that matches the given query.
+func (dbSession *{{.ModelName}}DBSession) Delete(query bson.M) error {
+	return dbSession.collection().Remove(query)
+}
+
+// DeleteAll deletes all instances of {{.InstanceName}} that match the given query.
+func (dbSession *{{.ModelName}}DBSession) DeleteAll(query bson.M) (int, error) {
+	info, err := dbSession.collection().RemoveAll(query)
+	return info.Removed, err
+}
+
+func (dbSession *{{.ModelName}}DBSession) database() *mgo.Database {
+	return dbSession.backend.DB(config.DefaultDBName)
+}
+
+func (dbSession *{{.ModelName}}DBSession) collection() *mgo.Collection {
+	return dbSession.database().C("{{.InstanceNamePlural  | Underscore}}")
+}
+
+// vi:syntax=go

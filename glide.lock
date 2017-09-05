@@ -1,0 +1,8 @@
+hash: cff20f884a9a49bd0e6f81a62a0fd0aac2c36ffb6ff1599a024a1c73b60c5c38
+updated: 2016-04-03T17:53:29.287670662-05:00
+imports:
+- name: bitbucket.org/pkg/inflect
+  version: 8961c3750a47
+- name: github.com/mgutz/ansi
+  version: c286dcecd19ff979eeb73ea444e479b903f2cfcb
+devImports: []
