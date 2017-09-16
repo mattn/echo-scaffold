@@ -1,10 +1,13 @@
 package config
 
 import (
-	"gopkg.in/mgo.v2"
-	//"gopkg.in/mgo.v2/bson"
+	"crypto/tls"
 	"log"
+	"net"
+	"net/url"
 	"os"
+
+	"gopkg.in/mgo.v2"
 )
 
 var mongodbSession *mgo.Session
@@ -23,7 +26,36 @@ func DBSession() *mgo.Session {
 		uri = "mongodb://localhost"
 	}
 
-	var err error
+	sslmode := false
+	hostname := ""
+	if url, err := url.Parse(uri); err == nil {
+		hostname = url.Hostname()
+		values := url.Query()
+		if ssl := values.Get("ssl"); ssl != "" {
+			if ssl == "true" {
+				sslmode = true
+			}
+			values.Del("ssl")
+			url.RawQuery = values.Encode()
+			uri = url.String()
+		}
+	}
+
+	di, err := mgo.ParseURL(uri)
+	if err != nil {
+		log.Fatalf("Can't parse mongo uri, go error %v\n", err)
+	}
+	if sslmode {
+		di.DialServer = func(addr *mgo.ServerAddr) (net.Conn, error) {
+			conn, err := tls.Dial("tcp", addr.TCPAddr().String(), &tls.Config{
+				ServerName: hostname,
+			})
+			if err != nil {
+				log.Println(err)
+			}
+			return conn, err
+		}
+	}
 	mongodbSession, err = mgo.Dial(uri)
 	if mongodbSession == nil || err != nil {
 		log.Fatalf("Can't connect to mongo, go error %v\n", err)

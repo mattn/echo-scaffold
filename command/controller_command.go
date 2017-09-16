@@ -73,5 +73,5 @@ func (command *ControllerCommand) Execute(args []string) {
 
 func (command *ControllerCommand) insertIntoRoutes() {
 	builder := template.NewBuilder("controller_router.go.tmpl")
-	builder.InsertAfterToPath("controllers/router.go", "func Setup(", command)
+	builder.InsertAfterToPath(filepath.FromSlash("controllers/router.go"), "func Setup(", command)
 }
