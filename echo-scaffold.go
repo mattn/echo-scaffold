@@ -11,8 +11,8 @@ import (
 
 func printUsageAndExit() {
 	fmt.Printf("Echo Scaffold\n")
-	for commandName, command := range command.Commands {
-		fmt.Printf("\nCommand `%s`:\n\n", commandName)
+	for _, command := range command.Commands {
+		fmt.Printf("\nCommand `%s`:\n\n", command.Name)
 		command.Help()
 	}
 	os.Exit(0)
