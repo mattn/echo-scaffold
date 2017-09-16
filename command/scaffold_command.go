@@ -1,6 +1,7 @@
 package command
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -8,6 +9,10 @@ import (
 )
 
 type ScaffoldCommand struct {
+}
+
+func (command *ScaffoldCommand) Name() string {
+	return "scaffold"
 }
 
 func (command *ScaffoldCommand) Help() {
@@ -23,11 +28,14 @@ Example:
 }
 
 func (command *ScaffoldCommand) Execute(args []string) {
-	if len(args) == 0 {
+	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Parse(args)
+	if flag.NArg() == 0 {
 		command.Help()
 		os.Exit(2)
 	}
-	args[0] = inflect.Singularize(args[0])
+
+	flag.Args()[0] = inflect.Singularize(flag.Arg(0))
 	modelCommand := &ModelCommand{}
 	modelCommand.Execute(args)
 

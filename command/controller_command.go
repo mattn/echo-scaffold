@@ -1,6 +1,7 @@
 package command
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,6 +22,10 @@ type ControllerCommand struct {
 	Fields             map[string]string
 }
 
+func (command *ControllerCommand) Name() string {
+	return "controller"
+}
+
 func (command *ControllerCommand) Help() {
 	fmt.Printf(`Usage:
 	echo-scaffold controller <controller name>
@@ -34,11 +39,14 @@ Example:
 }
 
 func (command *ControllerCommand) Execute(args []string) {
-	if len(args) == 0 {
+	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Parse(args)
+	if flag.NArg() == 0 {
 		command.Help()
 		os.Exit(2)
 	}
-	command.ControllerName = inflect.Titleize(args[0])
+
+	command.ControllerName = inflect.Titleize(flag.Arg(0))
 	command.RoutePath = inflect.Underscore(command.ControllerName)
 	command.ModelName = inflect.Singularize(command.ControllerName)
 	command.ModelNamePlural = inflect.Pluralize(command.ModelName)

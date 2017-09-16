@@ -1,6 +1,7 @@
 package command
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -21,6 +22,10 @@ type ModelCommand struct {
 	Fields             map[string]string
 }
 
+func (command *ModelCommand) Name() string {
+	return "model"
+}
+
 // Help prints a help message for this command.
 func (command *ModelCommand) Help() {
 	fmt.Printf(`Usage:
@@ -37,29 +42,16 @@ Example:
 func findFieldType(name string) string {
 	switch name {
 	case "text":
-		{
-			name = "string"
-		}
+		name = "string"
 	case "float":
-		{
-			name = "float64"
-		}
+		name = "float64"
 	case "boolean":
-		{
-			name = "bool"
-		}
+		name = "bool"
 	case "integer":
-		{
-			name = "int"
-		}
-	case
-		"time",
-		"datetime":
-		{
-			name = "int64"
-		}
+		name = "int"
+	case "time", "datetime":
+		name = "int64"
 	}
-
 	return name
 }
 
@@ -76,14 +68,17 @@ func processFields(args []string) map[string]string {
 
 // Execute runs this command.
 func (command *ModelCommand) Execute(args []string) {
-	if len(args) < 2 {
+	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Parse(args)
+	if flag.NArg() < 2 {
 		command.Help()
 		os.Exit(2)
 	}
-	command.ModelName = inflect.Titleize(args[0])
+
+	command.ModelName = inflect.Titleize(flag.Arg(0))
 	command.ModelNamePlural = inflect.Pluralize(command.ModelName)
 
-	command.Fields = processFields(args[1:])
+	command.Fields = processFields(flag.Args()[1:])
 	command.InstanceName = inflect.CamelizeDownFirst(command.ModelName)
 	command.InstanceNamePlural = inflect.Pluralize(command.InstanceName)
 	command.PackageName = template.PackageName()

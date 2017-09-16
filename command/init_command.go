@@ -1,6 +1,7 @@
 package command
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"path"
@@ -26,6 +27,10 @@ type InitCommand struct {
 	PackageName        string
 }
 
+func (command *InitCommand) Name() string {
+	return "init"
+}
+
 func (command *InitCommand) Help() {
 	fmt.Printf(`Usage:
 	echo-scaffold init <app path>
@@ -39,11 +44,14 @@ Example:
 }
 
 func (command *InitCommand) Execute(args []string) {
-	if len(args) == 0 {
+	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Parse(args)
+	if flag.NArg() == 0 {
 		command.Help()
 		os.Exit(2)
 	}
-	projectDir, err := filepath.Abs(args[0])
+
+	projectDir, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
 		panic(err)
 	}

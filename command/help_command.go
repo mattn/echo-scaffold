@@ -1,10 +1,15 @@
 package command
 
 import (
+	"flag"
 	"fmt"
 )
 
 type HelpCommand struct {
+}
+
+func (command *HelpCommand) Name() string {
+	return "help"
 }
 
 func (command *HelpCommand) Help() {
@@ -20,12 +25,14 @@ Example:
 }
 
 func (command *HelpCommand) Execute(args []string) {
-	if len(args) == 0 {
+	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Parse(args)
+	if flag.NArg() == 0 {
 		command.Help()
 		return
 	}
 
-	targetCommand := FindCommand(args[0])
+	targetCommand := FindCommand(flag.Arg(0))
 
 	if targetCommand == nil {
 		command.Help()

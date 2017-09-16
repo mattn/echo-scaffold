@@ -1,38 +1,50 @@
 package command
 
+type Cmd struct {
+	Short string
+	Name  string
+	Base  Base
+}
+
+func (c *Cmd) Help() {
+	c.Base.Help()
+}
+
 var (
-	Commands = map[string]Base{
-		"help":       &HelpCommand{},
-		"init":       &InitCommand{},
-		"model":      &ModelCommand{},
-		"controller": &ControllerCommand{},
-		"scaffold":   &ScaffoldCommand{},
+	Commands = []Cmd{
+		{
+			Short: "h",
+			Name:  "help",
+			Base:  &HelpCommand{},
+		},
+		{
+			Short: "i",
+			Name:  "init",
+			Base:  &InitCommand{},
+		},
+		{
+			Short: "m",
+			Name:  "model",
+			Base:  &ModelCommand{},
+		},
+		{
+			Short: "c",
+			Name:  "controller",
+			Base:  &ControllerCommand{},
+		},
+		{
+			Short: "s",
+			Name:  "scaffold",
+			Base:  &ScaffoldCommand{},
+		},
 	}
 )
 
 func FindCommand(name string) Base {
-	switch name {
-	case "i":
-		{
-			name = "init"
-		}
-	case "m":
-		{
-			name = "model"
-		}
-	case "c":
-		{
-			name = "controller"
-		}
-	case "s":
-		{
-			name = "scaffold"
-		}
-	case "h":
-		{
-			name = "help"
+	for _, c := range Commands {
+		if name == c.Short || name == c.Name {
+			return c.Base
 		}
 	}
-
-	return Commands[name]
+	return nil
 }
