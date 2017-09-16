@@ -9,7 +9,7 @@ import (
 
 var (
 	// Err{{.ModelName}}NotFound is returned when the {{.InstanceName}} was not found.
-	Err{{.ModelName}}NotFound     = helpers.NewResponseError(404, "{{.InstanceName}} not found")
+	Err{{.ModelName}}NotFound = helpers.NewResponseError(404, "{{.InstanceName}} not found")
 
 	// ErrCannotDelete{{.ModelName}} is returned when the {{.InstanceName}} can't be deleted.
 	ErrCannotDelete{{.ModelName}} = helpers.NewResponseError(404, "cannot delete {{.InstanceName}}")
@@ -56,7 +56,7 @@ func (controller *{{.ControllerName}}Controller) get{{.ModelName}}(c echo.Contex
 		return helpers.JSONResponseError(c, err)
 	}
 
-    return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
+	return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
 }
 
 func (controller *{{.ControllerName}}Controller) update{{.ModelName}}(c echo.Context) error {

@@ -2,13 +2,14 @@
 package models
 
 import (
+	"errors"
+	"net/url"
+	"time"
+	"strconv"
+
 	"{{.PackageName}}/helpers"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-	"net/url"
-	"time"
-	"errors"
-	"strconv"
 )
 
 var (
