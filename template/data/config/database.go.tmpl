@@ -56,7 +56,7 @@ func DBSession() *mgo.Session {
 			return conn, err
 		}
 	}
-	mongodbSession, err = mgo.Dial(uri)
+	mongodbSession, err = mgo.DialWithInfo(di)
 	if mongodbSession == nil || err != nil {
 		log.Fatalf("Can't connect to mongo, go error %v\n", err)
 	}
