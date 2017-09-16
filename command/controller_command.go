@@ -40,6 +40,7 @@ Example:
 
 func (command *ControllerCommand) Execute(args []string) {
 	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Usage = command.Help
 	flag.Parse(args)
 	if flag.NArg() == 0 {
 		command.Help()

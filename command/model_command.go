@@ -69,6 +69,7 @@ func processFields(args []string) map[string]string {
 // Execute runs this command.
 func (command *ModelCommand) Execute(args []string) {
 	flag := flag.NewFlagSet(command.Name(), flag.ExitOnError)
+	flag.Usage = command.Help
 	flag.Parse(args)
 	if flag.NArg() < 2 {
 		command.Help()
