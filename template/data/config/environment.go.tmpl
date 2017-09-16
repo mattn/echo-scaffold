@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/sirupsen/logrus"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 var (
@@ -17,7 +18,7 @@ var (
 // DefaultDBName is the default name for the database. Defaults to <app-name>-<environment>
 var DefaultDBName string
 
-func init() {
+func Setup(e *echo.Echo) {
 	if Environment == "" {
 		Environment = "development"
 	}
@@ -27,16 +28,15 @@ func init() {
 		tmpdir := filepath.Join(os.TempDir(), "{{.ProjectName}}")
 		os.MkdirAll(tmpdir, 0700)
 		logFileName := filepath.Join(tmpdir, fmt.Sprintf("%s-%d.log", Environment, time.Now().Unix()))
-		logFile, err := os.Create(logFileName)
-
-		if err == nil {
-			logrus.SetOutput(logFile)
-		} else {
-			logrus.WithFields(logrus.Fields{"err": err.Error()}).Error("error while opening log file.")
+		f, err := os.Create(logFileName)
+		if err != nil {
+			panic(err)
 		}
-		logrus.SetFormatter(&logrus.TextFormatter{DisableSorting: true, DisableColors: true})
+		e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Output: f,
+		}))
 	} else {
-		logrus.SetFormatter(&logrus.TextFormatter{DisableSorting: true})
+		e.Use(middleware.Logger())
 	}
 }
 

@@ -1,10 +1,12 @@
 package main
 
 import(
-	"{{.PackageName}}/controllers"
-	"github.com/labstack/echo"
-	"net/http"
 	"os"
+	"net/http"
+
+	"github.com/labstack/echo"
+	"{{.PackageName}}/config"
+	"{{.PackageName}}/controllers"
 )
 
 func getPort() string {
@@ -18,6 +20,8 @@ func getPort() string {
 
 func main() {
 	e := echo.New()
+
+	config.Setup(e)
 	controllers.Setup(e.Router())
 
 	e.GET("/", func(c echo.Context) error {
