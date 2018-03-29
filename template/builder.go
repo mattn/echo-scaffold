@@ -2,6 +2,8 @@ package template
 
 import (
 	"bufio"
+	"bytes"
+	"go/format"
 	"io"
 	"os"
 	"path/filepath"
@@ -84,10 +86,27 @@ func (builder *Builder) Template() *template.Template {
 }
 
 func (builder *Builder) Write(writer io.Writer, data interface{}) {
+	var w io.Writer = writer
+	var buf bytes.Buffer
+
+	if strings.HasSuffix(builder.TemplatePath, ".go.tmpl") {
+		w = &buf
+	}
 	tmpl := builder.Template()
-	err := tmpl.Execute(writer, data)
+	err := tmpl.Execute(w, data)
 	if err != nil {
 		panic(err)
+	}
+
+	if w != writer {
+		b, err := format.Source(buf.Bytes())
+		if err != nil {
+			panic(err)
+		}
+		_, err = io.Copy(writer, bytes.NewReader(b))
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
