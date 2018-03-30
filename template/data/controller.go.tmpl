@@ -26,7 +26,7 @@ func (controller *{{.ControllerName}}Controller) create{{.ModelName}}(c echo.Con
 	{{.InstanceName}} := &models.{{.ModelName}}{}
 	{{.InstanceName}}.SetAttributes(c.Request().Form)
 
-	defer {{.InstanceName}}.Save()
+	{{.InstanceName}}.Save()
 	if len({{.InstanceName}}.ErrorMessages()) == 0 {
 		return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
 	}
@@ -68,7 +68,7 @@ func (controller *{{.ControllerName}}Controller) update{{.ModelName}}(c echo.Con
 
 	{{.InstanceName}}.SetAttributes(c.Request().Form)
 
-	defer {{.InstanceName}}.Save()
+	{{.InstanceName}}.Save()
 	if len({{.InstanceName}}.ErrorMessages()) == 0 {
 		return helpers.JSONResponseObject(c, 200, {{.InstanceName}})
 	}
