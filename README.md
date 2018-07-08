@@ -3,6 +3,13 @@
 `Echo Scaffold` is CLI to generate scaffolds for the `echo` framework.
 For now the project only supports `mongodb` and `mgo` as database.
 
+## Requirements
+
+	go get github.com/globalsign/mgo
+	go get github.com/labstack/echo
+	go get github.com/dgrijalva/jwt-go
+	go get github.com/sirupsen/logrus
+
 ## Installation
 
 	go get github.com/mattn/echo-scaffold
