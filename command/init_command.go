@@ -3,6 +3,7 @@ package command
 import (
 	"flag"
 	"fmt"
+	"go/build"
 	"os"
 	"path"
 	"path/filepath"
@@ -60,7 +61,7 @@ func (command *InitCommand) Execute(args []string) {
 	wd, _ := os.Getwd()
 	wd = filepath.ToSlash(wd)
 	root := ""
-	for _, p := range filepath.SplitList(os.Getenv("GOPATH")) {
+	for _, p := range filepath.SplitList(build.Default.GOPATH) {
 		p = filepath.ToSlash(p)
 		if strings.HasPrefix(strings.ToLower(wd), strings.ToLower(filepath.ToSlash(filepath.Join(p, "src"))+"/")) {
 			root = wd[len(p+"/src/"):]

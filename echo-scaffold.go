@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go/build"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,15 +20,10 @@ func printUsageAndExit() {
 }
 
 func checkGOPATH() {
-	if os.Getenv("GOPATH") == "" {
-		fmt.Printf("$GOPATH is not defined. Exiting.\n")
-		os.Exit(2)
-	}
-
 	wd, _ := os.Getwd()
 	wd = filepath.ToSlash(wd)
 	found := false
-	for _, p := range filepath.SplitList(os.Getenv("GOPATH")) {
+	for _, p := range filepath.SplitList(build.Default.GOPATH) {
 		if strings.HasPrefix(strings.ToLower(wd), strings.ToLower(filepath.ToSlash(p))) {
 			found = true
 			break

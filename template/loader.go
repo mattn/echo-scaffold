@@ -1,6 +1,7 @@
 package template
 
 import (
+	"go/build"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -24,7 +25,7 @@ func LoadTemplateFromFile(filePath string) string {
 func PackageName() string {
 	wd, _ := os.Getwd()
 	wd = filepath.ToSlash(wd)
-	for _, p := range filepath.SplitList(os.Getenv("GOPATH")) {
+	for _, p := range filepath.SplitList(build.Default.GOPATH) {
 		p = filepath.ToSlash(p)
 		if strings.HasPrefix(strings.ToLower(wd), strings.ToLower(p)) {
 			return wd[len(p+"/src/"):]
@@ -34,7 +35,7 @@ func PackageName() string {
 }
 
 func ImportPath() string {
-	paths := filepath.SplitList(os.Getenv("GOPATH"))
+	paths := filepath.SplitList(build.Default.GOPATH)
 	wd, _ := os.Getwd()
 	wd = filepath.ToSlash(wd)
 	found := ""
