@@ -1,5 +1,4 @@
-{{$instanceName := .InstanceName}}\
-package models
+{{$instanceName := .InstanceName}}package models
 
 import (
 	"errors"
@@ -20,9 +19,9 @@ var (
 // {{.ModelName}} is a model
 type {{.ModelName}} struct {
 	ID bson.ObjectId  `bson:"_id,omitempty"`
-{{range $fieldName, $fieldType := .Fields}}\
+{{range $fieldName, $fieldType := .Fields}}
 	{{$fieldName}} {{$fieldType}} `bson:"{{$fieldName | Underscore}}"`
-{{end}}\
+{{end}}
 	CreatedAt int64 `bson:"created_at"`
 	UpdatedAt int64 `bson:"updated_at"`
 	Errors helpers.Errors `bson:"-"`
@@ -95,9 +94,9 @@ func ({{.InstanceName}} *{{.ModelName}}) update(dbSession *{{.ModelName}}DBSessi
 func ({{.InstanceName}} *{{.ModelName}}) ToResponseMap() helpers.ResponseMap {
 	return helpers.ResponseMap{
 		"id": {{.InstanceName}}.ID,
-{{range $fieldName, $fieldType := .Fields}}\
+{{range $fieldName, $fieldType := .Fields}}
 		"{{$fieldName | Underscore}}": {{$instanceName}}.{{$fieldName}},
-{{end}}\
+{{end}}
 	}
 }
 
@@ -125,11 +124,11 @@ func ({{.InstanceName}} *{{.ModelName}}) SetAttributes(params url.Values) {
 	// for avoiding compile unused strconv error.
 	var _ = strconv.FormatBool(true)
 
-{{range $fieldName, $fieldType := .Fields}}\
+{{range $fieldName, $fieldType := .Fields}}
 	if value, ok := params["{{$fieldName | Underscore}}"]; ok {
 		{{$instanceName}}.{{$fieldName}}{{ ret $fieldType }} = {{ conv "value[0]" $fieldType }}
 	}
-{{end}}\
+{{end}}
 }
 
 // FindOne{{.ModelName}} finds a {{.InstanceName}} in the database using the given `query`
