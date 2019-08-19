@@ -10,7 +10,7 @@ import (
 	"strings"
 	"text/template"
 
-	"bitbucket.org/pkg/inflect"
+	"github.com/markbates/inflect"
 )
 
 type state struct {

@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"bitbucket.org/pkg/inflect"
+	"github.com/markbates/inflect"
 	"github.com/mattn/echo-scaffold/template"
 )
 

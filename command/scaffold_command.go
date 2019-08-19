@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"bitbucket.org/pkg/inflect"
+	"github.com/markbates/inflect"
 )
 
 type ScaffoldCommand struct {

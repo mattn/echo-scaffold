@@ -1,4 +1,0 @@
-package: github.com/mattn/echo-scaffold
-import:
-- package: bitbucket.org/pkg/inflect
-- package: github.com/mgutz/ansi
