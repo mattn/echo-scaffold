@@ -8,6 +8,8 @@ github.com/markbates/inflect v1.0.5-0.20181024203552-d582c680dc4d h1:wSxSWKx9J39
 github.com/markbates/inflect v1.0.5-0.20181024203552-d582c680dc4d/go.mod h1:1fR9+pO2KHEO9ZRtto13gDwwZaAKstQzferVeWqbgNs=
 github.com/mattn/go-colorable v0.1.3-0.20190818022642-388941e3ea99 h1:qdKiReNYMFRnzdpgREmchX3MsN/ntzvYebawZToKG5M=
 github.com/mattn/go-colorable v0.1.3-0.20190818022642-388941e3ea99/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
+github.com/mattn/go-colorable v0.1.4 h1:snbPLB8fVfU9iwbbo30TPtbLRzwWu6aJS6Xh4eaaviA=
+github.com/mattn/go-colorable v0.1.4/go.mod h1:U0ppj6V5qS13XJ6of8GYAs25YV2eR4EVcfRqFIhoBtE=
 github.com/mattn/go-isatty v0.0.8 h1:HLtExJ+uU2HOZ+wI0Tt5DtUDrx8yhUqDcp7fYERX4CE=
 github.com/mattn/go-isatty v0.0.8/go.mod h1:Iq45c/XA43vh69/j3iqttzPXn0bhXyGjM0Hdxcsrc5s=
 github.com/mgutz/ansi v0.0.0-20170206155736-9520e82c474b h1:j7+1HpAFS1zy5+Q4qx1fWh90gTKwiN4QCGoY9TWyyO4=
